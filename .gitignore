@@ -39,3 +39,6 @@ ENV/
 # Sistema operativo
 .DS_Store
 Thumbs.db
+
+# Archivo de entrega UCM
+entrega_aula_virtual.txt
