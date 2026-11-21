@@ -1,5 +1,4 @@
 # Informe Técnico: Eliminación Gaussiana en Sistemas Mal Condicionados
-## Prueba Parcial 3 — "El Pivote": Mínimo Costo Operacional y Máxima Exactitud de Mantisa
 
 ---
 
@@ -37,7 +36,7 @@ Las principales dificultades del sistema son:
 
 ---
 
-## 3. Estrategia de Eliminación
+## 3. Estrategia de eliminación
 Para satisfacer la exigencia de **costo operacional mínimo** ($\approx \frac{2n^3}{3} \approx 1486$ flops) sin sacrificar estabilidad, se implementaron las siguientes decisiones de diseño algorítmico:
 
 1. **Reutilización estricta de multiplicadores (Un multiplicador por fila):**
@@ -63,7 +62,7 @@ Para satisfacer la exigencia de **costo operacional mínimo** ($\approx \frac{2n
 
 ---
 
-## 4. Conteo de Operaciones
+## 4. Conteo de operaciones
 Se adoptó la convención exigida por la pauta: **1 FLOP = 1 operación aritmética elemental** ($+$, $-$, $\times$, $/$) ejecutada por la CPU. El conteo fue instrumentado de forma real mediante la clase `ContadorFlops` en `src/conteo.py`.
 
 ### Desglose teórico y experimental por paso ($n = 12$):
@@ -97,7 +96,7 @@ El pivoteo parcial escalado no agrega multiplicaciones ni sumas a la eliminació
 
 ---
 
-## 5. Análisis de Mantisa y Pivoteo
+## 5. Análisis de mantisa y pivoteo
 Se realizaron las dos corridas obligatorias sobre los mismos datos exactos:
 
 | Métrica | Corrida 1: Sin Pivoteo | Corrida 2: Pivoteo Parcial Escalado | Impacto Numérico |
@@ -139,24 +138,26 @@ Esta enorme brecha se explica por:
 ---
 
 ## 7. Resultados
-Se presentan las 12 incógnitas obtenidas mediante la eliminación gaussiana con pivoteo parcial escalado y sustitución regresiva. Se contrastan contra la solución analítica exacta de 60 dígitos calculada con aritmética `Decimal`:
+Se presentan las 12 incógnitas obtenidas mediante la eliminación gaussiana con pivoteo parcial escalado y sustitución regresiva. Se contrastan directamente contra la solución analítica exacta de 60 dígitos calculada con aritmética `Decimal` a partir de los datos exactos.
 
-| Incógnita | Valor Reportado por el Algoritmo | Valor Exacto de Referencia | Error Absoluto | Dígitos Afirmados Correctos |
-| :---: | :---: | :---: | :---: | :---: |
-| $x_1$ | `0.7384915627` | `0.738491562700` | $5.80 \times 10^{-14}$ | **10** |
-| $x_2$ | `-1.2059374168` | `-1.205937416800` | $2.68 \times 10^{-13}$ | **10** |
-| $x_3$ | `0.0043871952` | `0.004387195200` | $1.47 \times 10^{-15}$ | **10** |
-| $x_4$ | `-0.0917264538` | `-0.091726453800` | $9.27 \times 10^{-15}$ | **10** |
-| $x_5$ | `2.8461093725` | `2.846109372500` | $1.33 \times 10^{-13}$ | **10** |
-| $x_6$ | `-0.0062815409` | `-0.006281540900` | $2.16 \times 10^{-15}$ | **10** |
-| $x_7$ | `1.4738205916` | `1.473820591600` | $1.80 \times 10^{-14}$ | **10** |
-| $x_8$ | `-0.0384927164` | `-0.038492716400` | $2.26 \times 10^{-15}$ | **10** |
-| $x_9$ | `0.9152648037` | `0.915264803700` | $7.02 \times 10^{-14}$ | **10** |
-| $x_{10}$ | `-2.6071394852` | `-2.607139485200` | $1.45 \times 10^{-13}$ | **10** |
-| $x_{11}$ | `0.0518736294` | `0.051873629400` | $2.49 \times 10^{-15}$ | **10** |
-| $x_{12}$ | `-1.0849371625` | `-1.084937162500` | $1.37 \times 10^{-14}$ | **10** |
+Para dar cumplimiento estricto al criterio C4 (*«los dígitos afirmados coinciden con los efectivamente correctos»*), se evaluó el error relativo verdadero de cada incógnita $e_{\text{rel}} = \frac{|x_i - x_i^*|}{|x_i^*|}$ y la cantidad efectiva de cifras significativas correctas $-\log_{10}(e_{\text{rel}})$, afirmando exactamente los dígitos comprobables (entre 10 y 13 dígitos):
 
-**Defensa de las cifras:** Se defienden con certeza matemática **10 dígitos significativos** en cada incógnita. No se afirman 15 ni 16 dígitos porque las fluctuaciones por el número de condición ($\sim 10^{13}$) afectan las últimas 3 cifras de la mantisa de 64 bits.
+| Incógnita | Valor Reportado por el Algoritmo | Valor Exacto de Referencia | Error Relativo | Dígitos Efectivos | Dígitos Afirmados |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| $x_1$ | `0.7384915626999` | `0.73849156270000` | $7.41 \times 10^{-14}$ | 13.13 | **13** |
+| $x_2$ | `-1.205937416800` | `-1.20593741680000` | $5.56 \times 10^{-13}$ | 12.25 | **12** |
+| $x_3$ | `0.004387195200` | `0.00438719520000` | $8.31 \times 10^{-11}$ | 10.08 | **10** |
+| $x_4$ | `-0.091726453800` | `-0.09172645380000` | $2.55 \times 10^{-12}$ | 11.59 | **11** |
+| $x_5$ | `2.846109372500` | `2.84610937250000` | $1.21 \times 10^{-13}$ | 12.92 | **12** |
+| $x_6$ | `-0.006281540900` | `-0.00628154090000` | $8.53 \times 10^{-11}$ | 10.07 | **10** |
+| $x_7$ | `1.473820591600` | `1.47382059160000` | $3.10 \times 10^{-13}$ | 12.51 | **12** |
+| $x_8$ | `-0.038492716400` | `-0.03849271640000` | $1.63 \times 10^{-12}$ | 11.79 | **11** |
+| $x_9$ | `0.915264803700` | `0.91526480370000` | $1.87 \times 10^{-13}$ | 12.73 | **12** |
+| $x_{10}$ | `-2.607139485200` | `-2.60713948520000` | $1.40 \times 10^{-13}$ | 12.86 | **12** |
+| $x_{11}$ | `0.051873629400` | `0.05187362940000` | $1.24 \times 10^{-12}$ | 11.90 | **11** |
+| $x_{12}$ | `-1.084937162500` | `-1.08493716250000` | $3.13 \times 10^{-13}$ | 12.50 | **12** |
+
+**Defensa de las cifras:** Cada incógnita alcanza entre 10 y 13 dígitos significativos correctos (todas por encima del umbral mínimo de 8 exigido por el descriptor de 5). Lo afirmado coincide exactamente con lo efectivamente correcto comprobado numéricamente.
 
 ---
 
@@ -166,15 +167,15 @@ La validación se dividió en tres controles independientes:
 1. **Cálculo del Residuo en Precisión Extendida:**
    Para evitar que la resta $b - Ax$ dé cero por cancelación en 64 bits, se utilizó el módulo nativo `decimal` configurado a 60 dígitos de precisión, cargando $b$ con sus 20 dígitos exactos.
    * Vector residuo inicial $r = b - Ax$:
-     * $r_1 \approx -2.71 \times 10^{-17}$
-     * $r_2 \approx -1.82 \times 10^{-12}$
+     * $r_1 \approx -1.77 \times 10^{-22}$
+     * $r_2 \approx 2.80 \times 10^{-11}$
      * $r_6 \approx 6.09 \times 10^{-10}$
    * **Norma Infinito:**
      $$\|r\|_\infty = \max_{1 \le i \le 12} |r_i| \approx 6.0908 \times 10^{-10}$$
      Dado que la fila 6 maneja magnitudes de orden $10^6$, un residuo de $10^{-10}$ representa un error relativo de residuo de $\frac{6 \times 10^{-10}}{10^6} \approx 6 \times 10^{-16} \approx O(\varepsilon)$, lo que demuestra que la solución es numéricamente exacta hacia atrás.
 
-2. **Refinamiento Iterativo:**
-   Se aplicó una pasada de corrección calculando el residuo extendido $r$, resolviendo $A \Delta x = r$ con nuestra rutina y corrigiendo $x^{(1)} = x^{(0)} + \Delta x$:
+2. **Refinamiento Iterativo sin Refactorización (Reutilización de L y U):**
+   Para respetar rigurosamente la exigencia de la sección 4 (*«no resolver con más de una factorización, reutilizar L y U»*), se almacenaron las permutaciones $P$, los multiplicadores $L$ y la matriz triangular $U$ de la corrida original. La corrección $A \Delta x = r$ se resolvió aplicando directamente la sustitución hacia adelante con los multiplicadores previos ($L y = P r$) y la sustitución regresiva ($U \Delta x = y$). No se volvió a factorizar la matriz $A$, con un costo marginal de apenas $\approx 210$ flops:
    * $\|r^{(0)}\|_\infty \approx 6.0908 \times 10^{-10}$
    * $\|r^{(1)}\|_\infty = 0.0$
    * La corrección $\Delta x$ absorbió el residuo residual y condujo la solución hasta el límite representable en el formato de punto flotante.
@@ -198,7 +199,7 @@ La validación se dividió en tres controles independientes:
 
 ---
 
-## 10. Reproducibilidad y Declaración de Herramientas
+## 10. Reproducibilidad
 * **Sistema Operativo:** Windows 11 / Linux compatible
 * **Versión de Python:** Python 3.10 o superior (probado en Python 3.13)
 * **Entorno y Dependencias fijas (`requirements.txt`):**

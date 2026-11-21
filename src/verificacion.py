@@ -8,9 +8,17 @@ import csv
 from decimal import Decimal, getcontext
 import numpy as np
 try:
-    from src.gauss import eliminacion_pivote_escalado, sustitucion_regresiva
+    from src.gauss import (
+        eliminacion_pivote_escalado, 
+        sustitucion_regresiva, 
+        resolver_con_factorizacion_existente
+    )
 except ImportError:
-    from gauss import eliminacion_pivote_escalado, sustitucion_regresiva
+    from gauss import (
+        eliminacion_pivote_escalado, 
+        sustitucion_regresiva, 
+        resolver_con_factorizacion_existente
+    )
 
 # Fijamos 60 digitos de precision para no perder nada de los 20 digitos de b
 getcontext().prec = 60
@@ -66,22 +74,26 @@ def calcular_norma_infinito(vector):
     return max_val
 
 
-def ejecutar_refinamiento_iterativo(A_np, b_np, matriz_dec, vector_dec, x_inicial):
+def ejecutar_refinamiento_iterativo(A_np, b_np, matriz_dec, vector_dec, x_inicial, factorizacion=None):
     # Refinamiento iterativo:
     # 1. Calculamos residuo r^(0) = b - Ax^(0) en alta precision
-    # 2. Resolvemos el sistema de correccion A * delta_x = r^(0)
+    # 2. Resolvemos el sistema de correccion A * delta_x = r^(0) reutilizando L y U
     # 3. Actualizamos x^(1) = x^(0) + delta_x
     # 4. Evaluamos el nuevo residuo r^(1)
     
     residuo_inicial = calcular_residuo_decimal(matriz_dec, vector_dec, x_inicial)
     norma_inicial = calcular_norma_infinito(residuo_inicial)
     
-    # Convertimos r^(0) a float64 para resolver con nuestra propia eliminacion
+    # Convertimos r^(0) a float64 para resolver
     r_np = np.array([float(r_i) for r_i in residuo_inicial], dtype=np.float64)
     
-    # Resolvemos A * delta_x = r usando eliminacion con pivoteo escalado propia
-    U_corr, r_mod, _, _, _ = eliminacion_pivote_escalado(A_np, r_np)
-    delta_x = sustitucion_regresiva(U_corr, r_mod)
+    # Resolvemos A * delta_x = r REUTILIZANDO la factorizacion L y U previa
+    # Cumple la regla: 'no resolver con mas de una factorizacion, reutilizar L y U'
+    if factorizacion is not None:
+        delta_x = resolver_con_factorizacion_existente(factorizacion, r_np)
+    else:
+        U_corr, r_mod, _, _, _, _ = eliminacion_pivote_escalado(A_np, r_np)
+        delta_x = sustitucion_regresiva(U_corr, r_mod)
     
     # Nueva solucion corregida
     x_refinado = x_inicial + delta_x

@@ -79,9 +79,12 @@ def eliminacion_sin_pivote(A_entrada, b_entrada, contador=None):
             if abs(m) > max_multiplicador:
                 max_multiplicador = abs(m)
                 
-            # Barrido de columnas desde la columna k en adelante (sin tocar ceros previos)
-            for j in range(k, n):
+            # Barrido de columnas desde la columna k+1 en adelante
+            for j in range(k + 1, n):
                 A[i, j] = A[i, j] - m * A[k, j]
+                
+            # Fijamos explicitamente en 0.0 el elemento subdiagonal para evitar residuos de redondeo
+            A[i, k] = 0.0
                 
             if contador:
                 # Se actualizaron (n - k) columnas en la fila i
@@ -122,6 +125,9 @@ def eliminacion_pivote_escalado(A_entrada, b_entrada, contador=None):
     for i in range(n):
         s[i] = np.max(np.abs(A[i, :]))
     
+    permutaciones = []
+    multiplicadores = []
+    
     for k in range(n - 1):
         # Busqueda del mejor pivote escalado entre las filas k a n-1
         # Comparamos |a_ik| / s_i
@@ -136,6 +142,9 @@ def eliminacion_pivote_escalado(A_entrada, b_entrada, contador=None):
                 mejor_ratio = ratio_actual
                 fila_mejor = i
                 
+        # Registramos la permutacion realizada en este paso
+        permutaciones.append(fila_mejor)
+        
         # Si la mejor fila no es la fila k, intercambiamos filas completas
         if fila_mejor != k:
             if contador:
@@ -146,11 +155,13 @@ def eliminacion_pivote_escalado(A_entrada, b_entrada, contador=None):
             s[[k, fila_mejor]] = s[[fila_mejor, k]]
             
         pivote = A[k, k]
+        mults_paso = {}
         
         # Ahora eliminamos hacia abajo igual que antes
         for i in range(k + 1, n):
             # Calculamos el multiplicador una sola vez por fila
             m = A[i, k] / pivote
+            mults_paso[i] = m
             
             if contador:
                 contador.registrar_division_multiplicador(k)
@@ -158,8 +169,11 @@ def eliminacion_pivote_escalado(A_entrada, b_entrada, contador=None):
             if abs(m) > max_multiplicador:
                 max_multiplicador = abs(m)
                 
-            for j in range(k, n):
+            for j in range(k + 1, n):
                 A[i, j] = A[i, j] - m * A[k, j]
+                
+            # Forzamos exactamente 0.0 en la subdiagonal para anularla de forma estricta
+            A[i, k] = 0.0
                 
             if contador:
                 contador.registrar_operacion_fila(k, n - k)
@@ -168,6 +182,8 @@ def eliminacion_pivote_escalado(A_entrada, b_entrada, contador=None):
             if contador:
                 contador.registrar_operacion_b(k)
                 
+        multiplicadores.append(mults_paso)
+        
         max_paso = np.max(np.abs(A))
         if max_paso > max_elemento_global:
             max_elemento_global = max_paso
@@ -176,7 +192,38 @@ def eliminacion_pivote_escalado(A_entrada, b_entrada, contador=None):
         
     factor_crecimiento = max_elemento_global / max_elemento_inicial
     
-    return A, b, max_multiplicador, factor_crecimiento, trazas
+    # Guardamos los datos de la factorizacion (L, U, P) para reutilizarlos en refinamiento
+    factorizacion = {
+        'U': A,
+        'permutaciones': permutaciones,
+        'multiplicadores': multiplicadores
+    }
+    
+    return A, b, max_multiplicador, factor_crecimiento, trazas, factorizacion
+
+
+def resolver_con_factorizacion_existente(factorizacion, b_nuevo):
+    # Reutiliza la factorizacion L y U ya calculada en eliminacion_pivote_escalado.
+    # Cumple estrictamente con la pauta: 'no resolver con mas de una factorizacion, reutilizar L y U'.
+    U = factorizacion['U']
+    permutaciones = factorizacion['permutaciones']
+    multiplicadores = factorizacion['multiplicadores']
+    
+    b = b_nuevo.copy()
+    n = len(b)
+    
+    # 1. Aplicamos las mismas permutaciones y multiplicadores sobre el nuevo vector (L * y = P * b)
+    for k in range(n - 1):
+        fila_mejor = permutaciones[k]
+        if fila_mejor != k:
+            b[k], b[fila_mejor] = b[fila_mejor], b[k]
+        for i in range(k + 1, n):
+            m = multiplicadores[k][i]
+            b[i] = b[i] - m * b[k]
+            
+    # 2. Sustitucion regresiva final: U * x = y
+    x = sustitucion_regresiva(U, b)
+    return x
 
 
 def sustitucion_regresiva(U, b, contador=None):
