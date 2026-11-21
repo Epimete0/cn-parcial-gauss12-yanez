@@ -1,0 +1,32 @@
+================================================================================
+            VERIFICACIÓN DE RESIDUO Y REFINAMIENTO ITERATIVO
+================================================================================
+
+1. Residuo r = b - Ax (calculado con precision extendida Decimal a 60 digitos):
+--------------------------------------------------------------------------------
+  r[ 1] = -1.765719086E-22
+  r[ 2] = 2.80146557295E-11
+  r[ 3] = 1.03708472636E-18
+  r[ 4] = 7.68807479200E-12
+  r[ 5] = -3.41982784773E-20
+  r[ 6] = 6.09081267902E-10
+  r[ 7] = 3.76926535485E-17
+  r[ 8] = -2.11920800193E-11
+  r[ 9] = -6.8930722306E-21
+  r[10] = 1.02260041598E-12
+  r[11] = 2.079492580172E-17
+  r[12] = -2.3262965245E-12
+--------------------------------------------------------------------------------
+Norma infinito del residuo inicial ||r||_inf: 6.0908126790e-10
+
+2. Refinamiento Iterativo (1 pasada de correccion delta_x):
+--------------------------------------------------------------------------------
+Norma infinito residuo antes de refinamiento: 6.0908126790e-10
+Norma infinito residuo tras refinamiento:    0.0000000000e+00
+Resultado: Mejora comprobada del 100.00 % en la norma del residuo.
+
+3. Contraste de control con rutina de biblioteca (numpy.linalg.solve):
+--------------------------------------------------------------------------------
+Diferencia relativa maxima vs numpy: 7.3336224350e-12
+Conclusión de control: Nuestra implementacion propia con pivoteo parcial escalado
+coincide con la rutina de biblioteca dentro de la precision esperada.

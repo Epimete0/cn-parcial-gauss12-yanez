@@ -7,7 +7,10 @@
 import csv
 from decimal import Decimal, getcontext
 import numpy as np
-from src.gauss import eliminacion_pivote_escalado, sustitucion_regresiva
+try:
+    from src.gauss import eliminacion_pivote_escalado, sustitucion_regresiva
+except ImportError:
+    from gauss import eliminacion_pivote_escalado, sustitucion_regresiva
 
 # Fijamos 60 digitos de precision para no perder nada de los 20 digitos de b
 getcontext().prec = 60
