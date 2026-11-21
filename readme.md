@@ -70,7 +70,7 @@ cn-parcial-gauss12-yanez/
 
 ### 6. Enlace al Informe Técnico
 Para el análisis detallado del error de redondeo, la explicación del pivote $a_{1,1}$, la casi dependencia de la fila 7, la pérdida de bits de mantisa y la discusión del número de condición $\kappa_2(A)$, consultar el documento técnico:
-* 👉 **[informe.md](informe.md)**
+* Documento: [informe.md](informe.md)
 
 ---
 
