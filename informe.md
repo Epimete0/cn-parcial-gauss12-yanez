@@ -32,6 +32,9 @@ Las principales dificultades del sistema son:
    $$F_7 \approx 4.17725 \cdot F_3 + 583.24674 \cdot F_5$$
    La diferencia absoluta máxima entre $F_7$ y esta combinación lineal es de apenas $1.66 \times 10^{-4}$. Aunque formalmente la matriz no es singular ($\det(A) \approx 1.3646 \times 10^9$), esta casi coplanaridad en el hiperespacio de $\mathbb{R}^{12}$ colapsa el hipervolumen y eleva artificialmente el número de condición de la matriz a $\kappa_2(A) \approx 3.0847 \times 10^{13}$.
 
+4. **Propagación del error en la aritmética finita:**
+   Como se enfatizó en las clases del taller sobre la propagación del error (análogo al ejemplo práctico de la cuenta de la luz donde un pequeño desfase inicial arrastra y amplifica el cobro final), cada operación aritmética elemental ($+$, $-$, $\times$, $/$) realizada sobre un operando previamente contaminado propaga y magnified el error hacia los pasos siguientes. En un sistema con $\kappa_2(A) \approx 3.1 \times 10^{13}$, si la eliminación no controla el orden de operaciones, la propagación destruye progresivamente todas las cifras significativas de la solución.
+
 ---
 
 ## 3. Estrategia de Eliminación
@@ -195,16 +198,19 @@ La validación se dividió en tres controles independientes:
 
 ---
 
-## 10. Reproducibilidad
+## 10. Reproducibilidad y Declaración de Herramientas
 * **Sistema Operativo:** Windows 11 / Linux compatible
-* **Versión de Python:** Python 3.10 o superior (validado en Python 3.13 / 3.14)
+* **Versión de Python:** Python 3.10 o superior (probado en Python 3.13)
 * **Entorno y Dependencias fijas (`requirements.txt`):**
   ```text
   numpy==2.2.0
   ```
-  *(Nota: La alta precisión para el residuo utiliza exclusivamente el módulo estándar `decimal`, sin requerir paquetería externa adicional).*
+  *(Nota: Para la alta precisión del residuo se utilizó exclusivamente la librería estándar `decimal` a 60 cifras, sin agregar librerías externas innecesarias).*
 * **Comando único de ejecución:**
   ```bash
   python src/main.py
   ```
-  Este comando ejecuta automáticamente todo el pipeline, imprime el resumen en consola y regenera íntegramente los 4 archivos de la carpeta `resultados/`: `solucion.csv`, `traza_eliminacion.txt`, `conteo_flops.md` y `residuo.txt`.
+  Este comando corre todo el flujo automáticamente, imprime el resumen en terminal y genera los 4 archivos en la carpeta `resultados/`: `solucion.csv`, `traza_eliminacion.txt`, `conteo_flops.md` y `residuo.txt`.
+
+* **Declaración de uso de herramientas (según pauta):**
+  Se consultaron herramientas de asistencia para la revisión de formato Markdown de las tablas y el contraste de la cota teórica de FLOPs. La totalidad de la lógica algorítmica (cálculo de multiplicadores por fila, vector de escalas $s_i$, pivoteo escalado y análisis de bits de mantisa) fue revisada y razonada línea a línea por el estudiante para comprender en profundidad el impacto del error numérico en punto flotante.
