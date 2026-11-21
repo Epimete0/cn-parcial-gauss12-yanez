@@ -106,7 +106,7 @@ def generar_reporte_residuo(residuo_ini, norma_ini, residuo_fin, norma_fin, diff
     # Prepara el contenido para resultados/residuo.txt
     lineas = []
     lineas.append("================================================================================")
-    lineas.append("            VERIFICACIÓN DE RESIDUO Y REFINAMIENTO ITERATIVO")
+    lineas.append("            VERIFICACION DE RESIDUO Y REFINAMIENTO ITERATIVO")
     lineas.append("================================================================================")
     lineas.append("")
     lineas.append("1. Residuo r = b - Ax (calculado con precision extendida Decimal a 60 digitos):")
@@ -129,7 +129,7 @@ def generar_reporte_residuo(residuo_ini, norma_ini, residuo_fin, norma_fin, diff
     lineas.append("3. Contraste de control con rutina de biblioteca (numpy.linalg.solve):")
     lineas.append("-" * 80)
     lineas.append(f"Diferencia relativa maxima vs numpy: {diff_np:.10e}")
-    lineas.append("Conclusión de control: Nuestra implementacion propia con pivoteo parcial escalado")
+    lineas.append("Conclusion de control: Nuestra implementacion propia con pivoteo parcial escalado")
     lineas.append("coincide con la rutina de biblioteca dentro de la precision esperada.")
     lineas.append("")
     return "\n".join(lineas)

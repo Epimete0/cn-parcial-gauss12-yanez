@@ -1,5 +1,5 @@
 ================================================================================
-            VERIFICACIÓN DE RESIDUO Y REFINAMIENTO ITERATIVO
+            VERIFICACION DE RESIDUO Y REFINAMIENTO ITERATIVO
 ================================================================================
 
 1. Residuo r = b - Ax (calculado con precision extendida Decimal a 60 digitos):
@@ -28,5 +28,5 @@ Resultado: Mejora comprobada del 100.00 % en la norma del residuo.
 3. Contraste de control con rutina de biblioteca (numpy.linalg.solve):
 --------------------------------------------------------------------------------
 Diferencia relativa maxima vs numpy: 7.3336224350e-12
-Conclusión de control: Nuestra implementacion propia con pivoteo parcial escalado
+Conclusion de control: Nuestra implementacion propia con pivoteo parcial escalado
 coincide con la rutina de biblioteca dentro de la precision esperada.
